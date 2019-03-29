@@ -1,0 +1,117 @@
+Starting in Main.
+
+====(Main)====
+The main method of Main.
+It starts by making a new Chess object. 
+
+Line 10 makes a scanner that takes input from the "console."
+It checks if the correct number of arguments were entered into the console. If not, it tells you and defines how to properly run the program (if it were run in the console).
+
+It then assigns the first argument from the console to be the name of the area file with the defined board.
+
+It then makes a Board object by running the getBoard method from class Chess.
+
+This brings us to the Chess class.
+
+====(Chess)====
+The getBoard method takes in the file name previously defined and if there is not already a board designated to this Chess object, it runs the createBoardFromAreaFile method, also in the Chess class.
+
+The createBoardFromAreaFile method takes the same file name.
+It makes a new board Board object.
+
+(In the try section)
+It finds where the area file is located and creates a scanner for it.
+
+It first adds the tiles. In the area file, the tiles are given a name and integer coordinates (e.g. a1 for bottom left). Each tile is run through the addTileNode method of Board.
+
+====(Board)====
+The addTileNode method takes in the name of the tile and its coordinates. It checks if the tile already exists on the board and does not add it if it does.
+If it can be added, a new TileNode object is made for it, it is added to an ArrayList that is used to keep track of all of the tiles, and it's occupied state is temporarily set to false.
+
+We will examine the TileNode class constructor to understand what is involved in the creation of each tile.
+
+====(TileNode)====
+In the TileNode class, the constructor sets the name and coordinates to what they should be (based off of the area file) and assigns a list of neighbors that is further explored later but essentially keeps track of which tiles are connected to which.
+
+====(Chess)====
+Returning to the Chess class, once all of the tiles are added, it moves on to creating the edges (a.k.a. the connections between the tiles.
+The edges are similarly defined in the area file.
+
+It runs the addEdge method from Board on each edge.
+
+====(Board)====
+addEdge is fairly similar to addTileNode.
+
+It checks if the file is trying to tell it to make a connection between a tile and itself. If it is, it throws an exception.
+
+If there is no problem, it makes TileNodes for the two tiles meant to be connected and mutually runs addEdge (from TileNode) on each of them.
+
+====(TileNode)====
+addEdge in TileNode is straightforward.
+It creates a new Edge object and adds the edge to be a neighbor of the Tile.
+
+====(Chess)====
+Once the edges are complete, we move on to adding pieces.
+It runs addPiece on each line until the end of the file.
+
+====(Board)====
+addPiece takes the team of the piece, the name (i.e. type (e.g. king)) of the piece, and the starting coordinates where it belongs. These parameters are all defined within the area file.
+
+If there does not yet exist lists of pieces for each team, they are created.
+
+It then creates the pieces. Each team creation is fundamentally the same with variations in what team list it is added to and such. We will examine the white team because it comes first.
+
+It examines what kind of piece is being made and then creates an object of the correct pice type. For example, if it reads in "rook" from the area file, it creates a Rook object at the given coordinates, adds it to the ArrayList for the white team (which holds superclass objects Piece, of which each piece type is a subclass), and sets the tile that the piece is positioned on to be occupied by the white team.
+
+Each piece is fundamentally the same, so we will examine the creation of a Rook object.
+
+====(Rook)====
+The rook, just like every piece, has a constructor and two methods.
+
+The constructor takes in the coordinates for the piece and what board it should be assigned to (which is obviously the same for every piece).
+
+The two methods will be examined more closely later, but a brief overview is that moveSet creates an ArrayList of all possible moves for the piece, given a set of restrictions, and the printMoves method simply does as its name implies and prints out the names of the possible moves.
+
+We return to the Main class, as nothing more is to be said of the addPiece method in Board nor of the getBoard/createBoardFromAreaFile methods in Chess.
+
+====(Main)====
+Now that we have a board, the system tells the user that the starting team is white. The following do-while loop is fairly simple and self-explanatory. It essentially just repeatedly asks what the user wants to do (i.e. what piece to move, where to move it), performs those actions, and tells the user what actions were performed.
+
+We will examine a few important methods from other classes.
+
+====(Board)====
+movePieceAtCoords
+This method takes the coordinates of the piece to be moved, the coordinates for it to be moved to, and what team it belongs to. 
+It gets the moveset of the piece from the respective piece's class. If the moveset includes the tile that is the desired end location, the piece is first set to reside in that location.
+
+If a piece is not a pawn, it can capture enemy pieces by occupying the same tile as the enemy, thus defeating it and removing it from play. So we check if the piece is not a pawn and, if so, we check if the destination tile is occupied by the enemy piece. If it is, we create a piece object identical to the piece on the tile and add it to the removed piece list while simultaneously removing it from the active piece list.
+
+If the piece is a pawn, it has special capture conditions (moving diagonally to the side of an enemy piece). The else condition covers this. It starts by making a similar TileNode object to that of the non-pawn pieces, but this is a tile associated with the location of the enemy in front of the pawn. If that tile is occupied by an enemy, it creates a piece to remove associated with that enemy piece and removes it from the active pieces and adds it to the removed pieces.
+
+Additionally, the pawn has a special movement condition wherein if it is the pawn's first move, it can move an extra tile forward. This is accounted for in the two lines concluding the else condition.
+
+Lastly, the teams are set for each of the tiles interacted with. The end tile is set to the new allegiance and the start tile is set to be unnoccupied.
+
+====(Rook)====
+moveSet
+As mentioned previously, this returns an ArrayList of tiles that are viable moves for the piece selected. It begins by making that ArrayList.
+
+It then creates integers meant to represent the coordinates where the piece resides currently, which will be used for reference further on.
+
+It also gets the team assigned to the tile that the piece rests on so that we will be able to test against it (e.g. piece can move onto tiles occupied by pieces of opposite team).
+
+For the rook, we also create 4 "obstacle counters." These are meant to be in reference to the 4 direcetions that the rook can travel. If the loop encounters a stopping point (e.g. piece of same team, edge of board, etc.), it will increment this counter and the loop will no longer search for moves in that direction.
+
+Looking at the for loop. As the comments say, it loops up to 7 because that is the maximum distance a rook would ever be able to travel, unobstructed, on a standard 8x8 board. If a board of larger size is ever implemented, this will have to be generalized. However, a smaller size would not be an issue as the obstacle counters would be incremented when it reaches the edge and the direction would no longer be explored.
+
+The rook is fairly simple and generalized, so I will only examine one of the four directions.
+
+obstacleCounter1 correlates to the 'right' direction. If that counter has not been incremented, we enter the if condition wherein the method checks for moves in that direction. It starts by setting a new TileNode object from the node one coordinate to the right of the current tile, noted by the (x + i, y) where i is the current index of the loop. I originally had it where this node was found repeatedly for each possible check, but refactored it so that it is now found only once per loop, maximum.
+
+The first if condition within this section checks if the tile to the right is either empty (could be the board edge or a hole in the board) or occupied by a piece of the same team. If it is, this is considered an obstacle, so all it does is increment the obstacle counter so this direction will no longer be checked.
+
+The next condition checks if the tile to the right is unoccupied. If it is, it is a viable move and it is added to the moveset.
+
+The final condition checks if the tile to the right is occupied by a piece of the enemy team. If it is, it is considered a viable move, but this tile cannot be passed. That is to say, it is added to the moveset AND the obstacle counter is incremented.
+
+The remaining 3 directions are near identical.

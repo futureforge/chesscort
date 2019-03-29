@@ -1,0 +1,23 @@
+1/31/18
+========
+-Fixed bug where bishop/queen moveSet() threw NullPointerException
+	-tiles now start on team "unnoc"
+
+-Fixed bug where area file wasn't found
+
+-Had fun :)
+
+========
+12/27/17
+========
+-Added the pawn as a piece
+	-implemented its movement and enemy capture abilities
+
+-Refactored moveSet() method of each piece to minimize use of getNodeFromCoords(x,y) method
+	-similar refactoring in Board class
+
+-Fixed bug where tile that a piece leaves was not being marked as unoccupied after movement
+
+-Added comments where lacking/necessary
+
+-Renamed variables to be more descriptive
